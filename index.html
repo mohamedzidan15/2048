@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Number Puzzle | ZIDAN DESIGNER</title>
+    
+    <!-- الخطوط محملة مرة واحدة فقط -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Cairo:wght@400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #ffd93d;
+            --bg-gradient: linear-gradient(135deg, #0a0a0f 0%, #0f0f1a 100%);
+            --text-color: #ffd93d;
+            --tile-gap: 10px;
+            --tile-radius: 14px;
+            --grid-padding: 12px;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            font-family: 'Cairo', sans-serif;
+            touch-action: manipulation;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            transition: background 0.4s, color 0.4s;
+            position: relative;
+            overflow-x: hidden;
+            overscroll-behavior: none;
+        }
+
+        /* الثيمات */
+        body.theme-cinema { 
+            --primary: #ffd93d; 
+            --bg-gradient: linear-gradient(135deg, #0a0a0f 0%, #0f0f1a 100%); 
+            --text-color: #ffd93d;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        body.theme-wood { 
+            --primary: #cd9a5b; 
+            --bg-gradient: linear-gradient(135deg, #1a0f08 0%, #2c1c12 100%); 
+            --text-color: #cd9a5b;
+            --card-bg: rgba(205, 154, 91, 0.1);
+            --border-color: rgba(205, 154, 91, 0.2);
+        }
+        body.theme-cartoon { 
+            --primary: #ff9999; 
+            --bg-gradient: linear-gradient(135deg, #1a0f0f 0%, #2a1a1a 100%); 
+            --text-color: #ff9999;
+            --card-bg: rgba(255, 153, 153, 0.1);
+            --border-color: rgba(255, 153, 153, 0.2);
+        }
+        body.theme-warzone { 
+            --primary: #8b7355; 
+            --bg-gradient: linear-gradient(135deg, #050403 0%, #0f0c08 100%); 
+            --text-color: #8b7355;
+            --card-bg: rgba(139, 115, 85, 0.1);
+            --border-color: rgba(139, 115, 85, 0.2);
+        }
+
+        .app-header {
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-weight: 900;
+            letter-spacing: 3px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-btn {
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            transition: 0.2s;
+            border: none;
+            color: var(--text-color);
+        }
+        .header-btn:active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(0.92);
+        }
+
+        .screen {
+            display: none;
+            position: relative;
+            width: 100%;
+            min-height: calc(100vh - 62px);
+            min-height: calc(100dvh - 62px);
+            overflow-y: auto;
+            padding: 20px 16px;
+            z-index: 10;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-btn {
+            border: none;
+            padding: 14px 24px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            max-width: 380px;
+            margin-top: 10px;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            text-align: center;
+            border-radius: 30px;
+            font-family: 'Cairo', sans-serif;
+            letter-spacing: 0.5px;
+            background: var(--primary);
+            color: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+        }
+        .main-btn.secondary-btn {
+            background: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+        }
+        .main-btn:active {
+            transform: scale(0.95);
+            filter: brightness(1.15);
+        }
+
+        /* القائمة الجانبية */
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1999;
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            cursor: pointer;
+        }
+        .menu-overlay.show { display: block; }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            z-index: 2000;
+            transition: 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            padding: 70px 18px 30px;
+            overflow-y: auto;
+            background: rgba(10, 10, 20, 0.97);
+            border-left: 2px solid var(--primary);
+            height: 100%;
+            height: 100dvh;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .side-menu.open { right: 0; }
+
+        .side-menu h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary);
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+        }
+        .side-menu p {
+            margin: 8px 0 4px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        .side-menu hr {
+            margin: 14px 0;
+            border-color: var(--border-color);
+        }
+
+        .volume-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .volume-slider input {
+            flex: 1;
+            accent-color: var(--primary);
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        /* أنماط الصفحة الرئيسية */
+        .home-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            padding-bottom: 40px;
+        }
+
+        .home-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+        @keyframes logoPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .home-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+        .home-subtitle {
+            opacity: 0.7;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        /* أنماط الصورة المضافة داخل الصفحة الرئيسية */
+        .home-image-container {
+            margin: 15px auto 10px auto;
+            width: 80%;
+            max-width: 280px;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 2px solid var(--primary);
+            transition: transform 0.3s ease;
+        }
+        .home-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            pointer-events: none;
+        }
+        /* تأثير بسيط عند hover أو اللمس */
+        @media (hover: hover) {
+            .home-image-container:hover {
+                transform: scale(1.02);
+            }
+        }
+
+        /* أنماط لعبة 2048 */
+        .game-2048-container {
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .score-board-2048 {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .score-box-2048 {
+            flex: 1;
+            min-width: 70px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .score-box-2048 .score-label {
+            font-size: 0.6rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        .score-box-2048 .score-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .grid-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 400px;
+            margin: 0 auto;
+            touch-action: none;
+        }
+
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: var(--tile-gap);
+            padding: var(--grid-padding);
+            background: var(--card-bg);
+            border-radius: 22px;
+            border: 2px solid var(--border-color);
+        }
+        .grid-bg .bg-cell {
+            border-radius: var(--tile-radius);
+            background: rgba(255, 255, 255, 0.03);
+            aspect-ratio: 1;
+        }
+
+        .grid-tiles {
+            position: absolute;
+            inset: 0;
+            padding: var(--grid-padding);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .tile {
+            position: absolute;
+            border-radius: var(--tile-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 3;
+            will-change: transform;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .tile.pop { animation: tilePop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .tile.new-spawn { animation: tileSpawn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        @keyframes tilePop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        @keyframes tileSpawn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes superGlow {
+            from { box-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
+            to { box-shadow: 0 0 55px rgba(255, 180, 0, 0.85); }
+        }
+
+        /* ألوان البلاطات */
+        .tile[data-value="2"] { background: #fce4d6; color: #5c4a3a; font-size: clamp(1.1rem, 4.5vw, 1.8rem); }
+        .tile[data-value="4"] { background: #fbd5b5; color: #5c4a3a; font-size: clamp(1.1rem, 4.5vw, 1.8rem); }
+        .tile[data-value="8"] { background: #f9a66c; color: #fff; font-size: clamp(1.1rem, 4.5vw, 1.8rem); }
+        .tile[data-value="16"] { background: #f58233; color: #fff; font-size: clamp(1.1rem, 4.5vw, 1.8rem); }
+        .tile[data-value="32"] { background: #f76b45; color: #fff; font-size: clamp(1rem, 4vw, 1.6rem); }
+        .tile[data-value="64"] { background: #f73e3e; color: #fff; font-size: clamp(1rem, 4vw, 1.6rem); }
+        .tile[data-value="128"] { background: #f4d03f; color: #fff; font-size: clamp(0.9rem, 3.5vw, 1.4rem); }
+        .tile[data-value="256"] { background: #f4c430; color: #fff; font-size: clamp(0.9rem, 3.5vw, 1.4rem); }
+        .tile[data-value="512"] { background: #f39c12; color: #fff; font-size: clamp(0.8rem, 3vw, 1.2rem); }
+        .tile[data-value="1024"] { background: #e67e22; color: #fff; font-size: clamp(0.7rem, 2.5vw, 1rem); }
+        .tile[data-value="2048"] { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #1a1a1a; font-size: clamp(0.7rem, 2.5vw, 1rem); animation: superGlow 0.8s ease-in-out infinite alternate; }
+        .tile[data-value="4096"] { background: linear-gradient(135deg, #ff0080, #ff8c00); color: #fff; font-size: clamp(0.6rem, 2vw, 0.9rem); }
+        .tile[data-value="8192"] { background: linear-gradient(135deg, #8a2be2, #ff1493); color: #fff; font-size: clamp(0.6rem, 2vw, 0.9rem); }
+
+        /* أنماط الغطاء (Game Over / Win) */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 22px;
+            z-index: 20;
+            gap: 12px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            text-align: center;
+            padding: 20px;
+            animation: fadeInOverlay 0.3s ease;
+        }
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .overlay h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        .overlay p {
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        /* أنماط لعبة البزل */
+        .puzzle-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .puzzle-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .puzzle-controls select, .puzzle-controls .ctrl-btn {
+            padding: 10px 14px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text-color);
+            border: 1px solid var(--primary);
+            font-family: 'Cairo', sans-serif;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .puzzle-controls select {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .puzzle-controls .ctrl-btn {
+            background: var(--primary);
+            color: #1a1a1a;
+            border: none;
+        }
+        .puzzle-controls .ctrl-btn:active {
+            transform: scale(0.93);
+            opacity: 0.85;
+        }
+
+        .puzzle-info {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .puzzle-stat {
+            flex: 1;
+            min-width: 60px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .puzzle-stat .stat-label {
+            font-size: 0.65rem;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+        .puzzle-stat .stat-value {
+            font-size: 1.3rem;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .grid-puzzle-bg {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            gap: 6px;
+            padding: 10px;
+            background: var(--card-bg);
+            border-radius: 22px;
+            border: 2px solid var(--border-color);
+        }
+        .grid-puzzle-tiles {
+            position: absolute;
+            inset: 0;
+            padding: 10px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .tile-puzzle {
+            position: absolute;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-family: 'Orbitron', 'Cairo', sans-serif;
+            font-size: clamp(1rem, 4vw, 1.8rem);
+            cursor: pointer;
+            pointer-events: auto;
+            transition: left 0.16s cubic-bezier(0.25, 0.8, 0.25, 1.2), top 0.16s cubic-bezier(0.25, 0.8, 0.25, 1.2), transform 0.1s;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            background: var(--primary);
+            color: #1a1a1a;
+            will-change: left, top, transform;
+        }
+        .tile-puzzle:active { transform: scale(0.93); }
+        .tile-puzzle.correct-position {
+            background: #4caf50 !important;
+            color: #fff !important;
+            border: 2px solid #2e7d32 !important;
+            box-shadow: 0 0 16px rgba(76, 175, 80, 0.7);
+            animation: correctPlace 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes correctPlace {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+        .tile-puzzle.empty-tile {
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            cursor: default;
+            pointer-events: none;
+            color: transparent;
+        }
+
+        /* صفحة الشرح */
+        .howto-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .howto-card h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .howto-card p {
+            line-height: 1.8;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+        .howto-card ul {
+            margin-right: 20px;
+            margin-top: 8px;
+        }
+        .howto-card li {
+            margin: 5px 0;
+        }
+
+        /* إشعار التوست Toast */
+        .notification-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: #000;
+            padding: 14px 20px;
+            border-radius: 50px;
+            text-align: center;
+            font-weight: 800;
+            z-index: 500;
+            animation: slideUpToast 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            font-size: 0.95rem;
+        }
+        @keyframes slideUpToast {
+            from { transform: translateY(120px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* شاشة الإنترو */
+        .intro-screen {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #000000 100%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .intro-screen.fade-out {
+            animation: introFadeOut 0.6s forwards;
+            animation-delay: 2.5s;
+        }
+        @keyframes introFadeOut {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        .intro-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            opacity: 0;
+        }
+        .intro-text.first {
+            color: #ffd93d;
+            text-shadow: 0 0 20px #ffd93d;
+            animation: win7Reveal 0.5s forwards;
+        }
+        .intro-text.second {
+            color: #6bcb77;
+            text-shadow: 0 0 20px #6bcb77;
+            animation: win7Reveal 0.5s forwards;
+            animation-delay: 0.4s;
+        }
+        .intro-sub {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #aaa;
+            opacity: 0;
+            animation: fadeInUp 0.6s forwards;
+            animation-delay: 1.2s;
+        }
+        @keyframes win7Reveal {
+            0% { opacity: 0; transform: scale(0.3) rotateY(80deg); filter: blur(8px); }
+            100% { opacity: 1; transform: scale(1) rotateY(0deg); filter: blur(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="theme-cinema">
+
+    <!-- شاشة الإنترو -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-text first">NUMBER</div>
+        <div class="intro-text second">PUZZLE</div>
+        <div class="intro-sub">MOHAMED ZIDAN</div>
+    </div>
+
+    <!-- الهيدر -->
+    <header class="app-header">
+        <button class="header-btn" id="menuBtn" aria-label="القائمة">☰</button>
+        <div class="logo">🧩 NUMBER PUZZLE</div>
+        <button class="header-btn" id="backBtn" aria-label="رجوع" style="visibility: hidden;">←</button>
+    </header>
+
+    <!-- القائمة الجانبية -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+    <nav class="side-menu" id="sideMenu">
+        <h2>⚙️ الإعدادات</h2>
+        <p>الثيمات:</p>
+        <button class="main-btn" data-theme="cinema">ذهبي</button>
+        <button class="main-btn" data-theme="wood"> خشبي</button>
+        <button class="main-btn" data-theme="cartoon">كارتوني</button>
+        <button class="main-btn" data-theme="warzone">قديم</button>
+        <hr>
+        <div class="volume-slider">
+            <span>🔈</span>
+            <input type="range" id="volumeSlider" min="0" max="100" value="70" aria-label="مستوى الصوت">
+            <span>🔊</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin: 10px 0;">
+            <button class="main-btn" id="musicToggleBtn" style="font-size:0.75rem;">🎵 إيقاف الموسيقى</button>
+            <button class="main-btn" id="sfxToggleBtn" style="font-size:0.75rem;">🔊 كتم المؤثرات</button>
+        </div>
+        <div class="info-card">
+            <p>إصدار 1.0 |تصميم:mohamed zidan</p>
+        </div>
+        <button class="main-btn" id="homeBtn">🏠 الرئيسية</button>
+    </nav>
+
+    <!-- الصفحة الرئيسية -->
+    <main class="screen active" id="homeScreen">
+        <div class="home-content">
+            <div class="home-logo">🧩 NUMBER PUZZLE 🔢</div>
+            <h1 class="home-title">تحدي الأرقام والحروف</h1>
+            <p class="home-subtitle">اختر لعبتك المفضلة</p>
+            
+            <!-- مكان إضافة الصورة 1.png -->
+            <div class="home-image-container">
+                <img src="1.png" alt="Number Puzzle Logo" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%23ffd93d\'/%3E%3Ctext x=\'50%%\' y=\'50%%\' font-size=\'24\' text-anchor=\'middle\' dy=\'.3em\' fill=\'black\' font-family=\'monospace\'%3E1.png%3C/text%3E%3C/svg%3E'">
+            </div>
+            <!-- نهاية إضافة الصورة -->
+            
+            <button class="main-btn" data-nav="game2048Screen">🔢 2048 - دمج الأرقام</button>
+            <button class="main-btn" data-nav="puzzleScreen">🧩 لغز الترتيب (مراحل)</button>
+            <button class="main-btn secondary-btn" data-nav="howtoScreen">📖 شرح الألعاب</button>
+        </div>
+    </main>
+
+    <!-- صفحة الشرح -->
+    <section class="screen" id="howtoScreen">
+        <div style="max-width:500px;width:100%;">
+            <h2 style="color:var(--primary);text-align:center;margin-bottom:20px;">📖 دليل الألعاب</h2>
+            <div class="howto-card">
+                <h3>🔢 2048 - دمج الأرقام</h3>
+                <p>اسحب بأصبعك لدمج الأرقام المتطابقة. الهدف الوصول إلى 2048. كلما زاد الرقم، زادت درجة الصعوبة والإثارة.</p>
+            </div>
+            <div class="howto-card">
+                <h3>🧩 لغز الترتيب</h3>
+                <p>انقر أو اسحب المربع المجاور للفراغ لتحريكه. الهدف ترتيب المحتوى تصاعدياً. المربع الذي يصل إلى موضعه الصحيح يتحول إلى <span style="color:#4caf50;font-weight:bold;">اللون الأخضر</span>.</p>
+                <ul>
+                    <li>🔢 <strong>أرقام</strong>: ترتيب طبيعي 1،2،3...</li>
+                    <li>🔤 <strong>إنجليزي</strong>: ترتيب A,B,C...</li>
+                    <li>🇸🇦 <strong>عربي</strong>: ترتيب أ، ب، ت... من <strong>اليمين إلى اليسار</strong>.</li>
+                </ul>
+            </div>
+            <button class="main-btn" data-nav="homeScreen" style="margin-top:15px;">🏠 العودة إلى الرئيسية</button>
+        </div>
+    </section>
+
+    <!-- شاشة 2048 -->
+    <section class="screen" id="game2048Screen">
+        <div class="game-2048-container">
+            <div class="score-board-2048">
+                <div class="score-box-2048"><div class="score-label">النقاط</div><div class="score-value" id="score2048">0</div></div>
+                <div class="score-box-2048"><div class="score-label">أفضل نتيجة</div><div class="score-value" id="bestScore2048">0</div></div>
+                <div class="score-box-2048"><div class="score-label">أعلى رقم</div><div class="score-value" id="maxTile2048">2</div></div>
+            </div>
+            <div class="grid-wrapper" id="grid2048Wrapper">
+                <div class="grid-bg" id="grid2048Bg"></div>
+                <div class="grid-tiles" id="grid2048Tiles"></div>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="main-btn" id="reset2048Btn">🔄 جديد</button>
+                <button class="main-btn secondary-btn" data-nav="homeScreen">🏠 الرئيسية</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- شاشة البزل -->
+    <section class="screen" id="puzzleScreen">
+        <div class="puzzle-container">
+            <div class="puzzle-controls">
+                <select id="puzzleModeSelect">
+                    <option value="numbers">🔢 أرقام</option>
+                    <option value="english">🔤 إنجليزي A-Z</option>
+                    <option value="arabic">🇸🇦 عربي أ-ي</option>
+                </select>
+                <button class="ctrl-btn" id="resetPuzzleBtn">🔄 بدء المرحلة</button>
+            </div>
+            <div class="puzzle-info">
+                <div class="puzzle-stat"><div class="stat-label">الحركات</div><div class="stat-value" id="puzzleMoves">0</div></div>
+                <div class="puzzle-stat"><div class="stat-label">المرحلة</div><div class="stat-value" id="stageLabel">3x3</div></div>
+                <div class="puzzle-stat"><div class="stat-label">الوقت</div><div class="stat-value" id="puzzleTimer">00:00</div></div>
+            </div>
+            <div class="grid-wrapper" id="gridPuzzleWrapper">
+                <div class="grid-puzzle-bg" id="gridPuzzleBg"></div>
+                <div class="grid-puzzle-tiles" id="gridPuzzleTiles"></div>
+            </div>
+            <button class="main-btn secondary-btn" data-nav="homeScreen" style="margin-top:5px;">🏠 الرئيسية</button>
+        </div>
+    </section>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // ==================== نظام إدارة التطبيق ====================
+        const App = {
+            state: {
+                currentScreen: 'homeScreen',
+                previousScreen: 'homeScreen',
+                volume: 70,
+                isMusicMuted: false,
+                isSfxMuted: false,
+                theme: 'cinema',
+                audioInitialized: false
+            },
+            audio: {
+                ctx: null,
+                gainNode: null,
+                music: null,
+                sounds: {}
+            },
+            screens: {},
+            
+            init() {
+                this.cacheDom();
+                this.bindGlobalEvents();
+                this.loadSettings();
+                this.initIntro();
+                this.initScreens();
+                this.initMenuButtons();
+                console.log('🚀 تطبيق Number Puzzle جاهز | إصدار 1.0');
+            },
+
+            cacheDom() {
+                this.dom = {
+                    introScreen: document.getElementById('introScreen'),
+                    menuBtn: document.getElementById('menuBtn'),
+                    backBtn: document.getElementById('backBtn'),
+                    sideMenu: document.getElementById('sideMenu'),
+                    menuOverlay: document.getElementById('menuOverlay'),
+                    volumeSlider: document.getElementById('volumeSlider'),
+                    musicToggleBtn: document.getElementById('musicToggleBtn'),
+                    sfxToggleBtn: document.getElementById('sfxToggleBtn'),
+                    homeBtn: document.getElementById('homeBtn'),
+                    screens: document.querySelectorAll('.screen'),
+                    themeBtns: document.querySelectorAll('[data-theme]'),
+                    navBtns: document.querySelectorAll('[data-nav]')
+                };
+            },
+
+            bindGlobalEvents() {
+                this.dom.menuBtn.addEventListener('click', () => this.toggleMenu());
+                this.dom.menuOverlay.addEventListener('click', () => this.closeMenu());
+                this.dom.backBtn.addEventListener('click', () => this.goBack());
+                this.dom.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
+                this.dom.musicToggleBtn.addEventListener('click', () => this.toggleMusic());
+                this.dom.sfxToggleBtn.addEventListener('click', () => this.toggleSfx());
+                this.dom.homeBtn.addEventListener('click', () => { this.navigateTo('homeScreen'); this.closeMenu(); });
+
+                this.dom.themeBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.setTheme(btn.dataset.theme);
+                        this.closeMenu();
+                    });
+                });
+
+                this.dom.navBtns.forEach(btn => {
+                    btn.addEventListener('click', () => this.navigateTo(btn.dataset.nav));
+                });
+
+                // تحميل الصوت عند أول تفاعل
+                const initAudioOnce = () => {
+                    if (!this.state.audioInitialized) {
+                        this.initAudio();
+                        this.state.audioInitialized = true;
+                    }
+                };
+                document.body.addEventListener('touchstart', initAudioOnce, { once: true, passive: true });
+                document.body.addEventListener('mousedown', initAudioOnce, { once: true });
+            },
+
+            loadSettings() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('numpuz_settings') || '{}');
+                    this.state.volume = saved.volume || 70;
+                    this.state.isMusicMuted = saved.isMusicMuted || false;
+                    this.state.isSfxMuted = saved.isSfxMuted || false;
+                    this.state.theme = saved.theme || 'cinema';
+                } catch(e) {}
+                this.setTheme(this.state.theme, false);
+                if (this.dom.volumeSlider) this.dom.volumeSlider.value = this.state.volume;
+                this.updateAudioButtons();
+            },
+
+            saveSettings() {
+                try {
+                    localStorage.setItem('numpuz_settings', JSON.stringify({
+                        volume: this.state.volume,
+                        isMusicMuted: this.state.isMusicMuted,
+                        isSfxMuted: this.state.isSfxMuted,
+                        theme: this.state.theme
+                    }));
+                } catch(e) {}
+            },
+
+            toggleMenu() {
+                this.dom.sideMenu.classList.toggle('open');
+                this.dom.menuOverlay.classList.toggle('show');
+            },
+
+            closeMenu() {
+                this.dom.sideMenu.classList.remove('open');
+                this.dom.menuOverlay.classList.remove('show');
+            },
+
+            navigateTo(screenId) {
+                if (this.state.currentScreen === screenId) return;
+                this.state.previousScreen = this.state.currentScreen;
+                this.state.currentScreen = screenId;
+                
+                this.dom.screens.forEach(s => s.classList.remove('active'));
+                const target = document.getElementById(screenId);
+                if (target) target.classList.add('active');
+                
+                this.updateBackButton();
+                this.closeMenu();
+
+                // تحميل الشاشات عند الحاجة
+                if (screenId === 'game2048Screen' && !App2048.initialized) App2048.init();
+                if (screenId === 'puzzleScreen' && !AppPuzzle.initialized) AppPuzzle.init();
+            },
+
+            goBack() {
+                const backMap = {
+                    'game2048Screen': 'homeScreen',
+                    'puzzleScreen': 'homeScreen',
+                    'howtoScreen': 'homeScreen'
+                };
+                const target = backMap[this.state.currentScreen] || 'homeScreen';
+                this.navigateTo(target);
+            },
+
+            updateBackButton() {
+                const showBack = this.state.currentScreen !== 'homeScreen';
+                this.dom.backBtn.style.visibility = showBack ? 'visible' : 'hidden';
+            },
+
+            // ==================== نظام الصوت ====================
+            initAudio() {
+                try {
+                    this.audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.audio.gainNode = this.audio.ctx.createGain();
+                    this.audio.gainNode.connect(this.audio.ctx.destination);
+                    this.audio.gainNode.gain.value = this.state.volume / 100;
+
+                    // إنشاء موسيقى خلفية باستخدام oscillator (بدون ملفات خارجية)
+                    this.createBgMusic();
+                    if (!this.state.isMusicMuted) {
+                        this.playBgMusic();
+                    }
+
+                    // تحميل مؤثرات صوتية
+                    this.createSfxBuffers();
+                } catch(e) {
+                    console.warn('الصوت غير متاح:', e.message);
+                }
+            },
+
+            createBgMusic() {
+                if (!this.audio.ctx) return;
+                // موسيقى بسيطة باستخدام Web Audio API
+                const ctx = this.audio.ctx;
+                const playNote = (freq, startTime, duration) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.value = 0.08;
+                    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.audio.gainNode);
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                };
+
+                this.playBgMusic = () => {
+                    if (this.state.isMusicMuted || !this.audio.ctx) return;
+                    const now = this.audio.ctx.currentTime;
+                    const notes = [262, 330, 392, 523, 392, 330, 262, 294, 349, 440, 349, 294, 262];
+                    notes.forEach((freq, i) => {
+                        playNote(freq, now + i * 0.4, 0.35);
+                    });
+                    // تكرار كل 6 ثواني
+                    this._musicInterval = setInterval(() => {
+                        if (this.state.isMusicMuted) return;
+                        const t = this.audio.ctx.currentTime;
+                        notes.forEach((freq, i) => playNote(freq, t + i * 0.4, 0.35));
+                    }, 6000);
+                };
+
+                this.stopBgMusic = () => {
+                    if (this._musicInterval) {
+                        clearInterval(this._musicInterval);
+                        this._musicInterval = null;
+                    }
+                };
+            },
+
+            createSfxBuffers() {
+                if (!this.audio.ctx) return;
+                this.audio.sfx = {
+                    move: { freq: 600, dur: 0.08, vol: 0.15 },
+                    merge: { freq: 1200, dur: 0.18, vol: 0.2 },
+                    win: { freq: 1600, dur: 0.4, vol: 0.25 },
+                    click: { freq: 800, dur: 0.05, vol: 0.1 }
+                };
+            },
+
+            playSfx(type) {
+                if (this.state.isSfxMuted || !this.audio.ctx || !this.audio.sfx) return;
+                try {
+                    const s = this.audio.sfx[type];
+                    if (!s) return;
+                    const osc = this.audio.ctx.createOscillator();
+                    const gain = this.audio.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = s.freq;
+                    gain.gain.value = s.vol;
+                    gain.gain.exponentialRampToValueAtTime(0.00001, this.audio.ctx.currentTime + s.dur);
+                    osc.connect(gain);
+                    gain.connect(this.audio.gainNode);
+                    osc.start();
+                    osc.stop(this.audio.ctx.currentTime + s.dur);
+                } catch(e) {}
+            },
+
+            setVolume(val) {
+                this.state.volume = parseInt(val);
+                if (this.audio.gainNode) {
+                    this.audio.gainNode.gain.value = this.state.volume / 100;
+                }
+                this.saveSettings();
+            },
+
+            toggleMusic() {
+                this.state.isMusicMuted = !this.state.isMusicMuted;
+                if (this.state.isMusicMuted) {
+                    this.stopBgMusic();
+                } else {
+                    if (this.audio.ctx) this.playBgMusic();
+                }
+                this.updateAudioButtons();
+                this.saveSettings();
+            },
+
+            toggleSfx() {
+                this.state.isSfxMuted = !this.state.isSfxMuted;
+                this.updateAudioButtons();
+                this.saveSettings();
+            },
+
+            stopBgMusic() {
+                if (this.audio._musicInterval) {
+                    clearInterval(this.audio._musicInterval);
+                    this.audio._musicInterval = null;
+                }
+            },
+
+            updateAudioButtons() {
+                this.dom.musicToggleBtn.textContent = this.state.isMusicMuted ? '🎵 تشغيل الموسيقى' : '🎵 إيقاف الموسيقى';
+                this.dom.sfxToggleBtn.textContent = this.state.isSfxMuted ? '🔊 تشغيل المؤثرات' : '🔊 كتم المؤثرات';
+            },
+
+            setTheme(theme, save = true) {
+                this.state.theme = theme;
+                document.body.className = 'theme-' + theme;
+                if (save) this.saveSettings();
+            },
+
+            showToast(msg, duration = 2500) {
+                const toast = document.createElement('div');
+                toast.className = 'notification-toast';
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), duration);
+            },
+
+            initIntro() {
+                const intro = this.dom.introScreen;
+                if (!intro) return;
+                setTimeout(() => {
+                    intro.classList.add('fade-out');
+                    setTimeout(() => {
+                        intro.style.display = 'none';
+                    }, 600);
+                }, 2800);
+            },
+
+            initScreens() {
+                this.navigateTo('homeScreen');
+            },
+
+            initMenuButtons() {
+                // تهيئة إضافية للقائمة
+            }
+        };
+
+        // ==================== لعبة 2048 ====================
+        const App2048 = {
+            initialized: false,
+            grid: [],
+            score: 0,
+            bestScore: 0,
+            maxTile: 2,
+            gameOver: false,
+            gameWon: false,
+            moved: false,
+            mergedPositions: new Set(),
+            newSpawnPositions: new Set(),
+            touchStartX: 0,
+            touchStartY: 0,
+            touchActive: false,
+
+            init() {
+                if (this.initialized) return;
+                this.initialized = true;
+                this.loadBestScore();
+                this.buildBg();
+                this.reset();
+                this.bindSwipeEvents();
+                this.bindButtons();
+                this.bindKeyboard();
+                document.getElementById('score2048').textContent = '0';
+                document.getElementById('bestScore2048').textContent = this.bestScore;
+                document.getElementById('maxTile2048').textContent = '2';
+            },
+
+            loadBestScore() {
+                try {
+                    this.bestScore = parseInt(localStorage.getItem('numpuz_best2048') || '0');
+                } catch(e) {
+                    this.bestScore = 0;
+                }
+            },
+
+            saveBestScore() {
+                try {
+                    localStorage.setItem('numpuz_best2048', this.bestScore.toString());
+                } catch(e) {}
+            },
+
+            buildBg() {
+                const bg = document.getElementById('grid2048Bg');
+                bg.innerHTML = '';
+                for (let i = 0; i < 16; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'bg-cell';
+                    bg.appendChild(cell);
+                }
+            },
+
+            reset() {
+                this.grid = Array.from({ length: 4 }, () => Array(4).fill(0));
+                this.score = 0;
+                this.maxTile = 2;
+                this.gameOver = false;
+                this.gameWon = false;
+                this.mergedPositions.clear();
+                this.newSpawnPositions.clear();
+                this.spawnTile(false);
+                this.spawnTile(false);
+                this.render();
+                document.getElementById('score2048').textContent = '0';
+                document.getElementById('maxTile2048').textContent = '2';
+                const wrapper = document.getElementById('grid2048Wrapper');
+                const oldOverlay = wrapper.querySelector('.overlay');
+                if (oldOverlay) oldOverlay.remove();
+            },
+
+            spawnTile(isNew) {
+                const empty = [];
+                for (let r = 0; r < 4; r++) {
+                    for (let c = 0; c < 4; c++) {
+                        if (this.grid[r][c] === 0) empty.push({ r, c });
+                    }
+                }
+                if (empty.length === 0) return null;
+                const pos = empty[Math.floor(Math.random() * empty.length)];
+                const rand = Math.random();
+                let value = 2;
+                if (rand > 0.85) value = 4;
+                if (rand > 0.95) value = 8;
+                this.grid[pos.r][pos.c] = value;
+                if (isNew) this.newSpawnPositions.add(`${pos.r},${pos.c}`);
+                if (value > this.maxTile) {
+                    this.maxTile = value;
+                    document.getElementById('maxTile2048').textContent = this.maxTile;
+                }
+                return pos;
+            },
+
+            getTileSize() {
+                const wrapper = document.getElementById('grid2048Wrapper');
+                const w = wrapper.clientWidth;
+                const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tile-gap'));
+                const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--grid-padding'));
+                return (w - 2 * pad - 3 * gap) / 4;
+            },
+
+            render() {
+                const container = document.getElementById('grid2048Tiles');
+                if (!container) return;
+                container.innerHTML = '';
+                const size = this.getTileSize();
+                const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tile-gap'));
+                const pad = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--grid-padding'));
+
+                for (let r = 0; r < 4; r++) {
+                    for (let c = 0; c < 4; c++) {
+                        const val = this.grid[r][c];
+                        if (val === 0) continue;
+                        const tile = document.createElement('div');
+                        tile.className = 'tile';
+                        tile.setAttribute('data-value', val);
+                        tile.textContent = val;
+                        tile.style.left = `${pad + c * (size + gap)}px`;
+                        tile.style.top = `${pad + r * (size + gap)}px`;
+                        tile.style.width = `${size}px`;
+                        tile.style.height = `${size}px`;
+                        tile.style.lineHeight = `${size}px`;
+                        
+                        const key = `${r},${c}`;
+                        if (this.mergedPositions.has(key)) tile.classList.add('pop');
+                        if (this.newSpawnPositions.has(key)) tile.classList.add('new-spawn');
+                        
+                        container.appendChild(tile);
+                    }
+                }
+                this.mergedPositions.clear();
+                this.newSpawnPositions.clear();
+
+                if (this.gameOver) {
+                    this.showOverlay(
+                        this.gameWon ? '🎉 فزت!' : '😞 انتهت اللعبة',
+                        `النقاط: ${this.score}`,
+                        '🔄 حاول مجدداً',
+                        () => this.reset()
+                    );
+                }
+            },
+
+            showOverlay(title, subtitle, btnText, callback) {
+                const wrapper = document.getElementById('grid2048Wrapper');
+                const existing = wrapper.querySelector('.overlay');
+                if (existing) existing.remove();
+                
+                const ov = document.createElement('div');
+                ov.className = 'overlay';
+                ov.innerHTML = `
+                    <h2>${title}</h2>
+                    <p>${subtitle}</p>
+                    <button class="main-btn" style="max-width:200px;">${btnText}</button>
+                `;
+                ov.querySelector('button').addEventListener('click', () => {
+                    ov.remove();
+                    if (callback) callback();
+                });
+                wrapper.appendChild(ov);
+            },
+
+            rotateGrid(grid, times) {
+                let g = grid.map(r => [...r]);
+                for (let t = 0; t < times; t++) {
+                    const ng = Array.from({ length: 4 }, () => Array(4).fill(0));
+                    for (let r = 0; r < 4; r++) {
+                        for (let c = 0; c < 4; c++) {
+                            ng[c][3 - r] = g[r][c];
+                        }
+                    }
+                    g = ng;
+                }
+                return g;
+            },
+
+            move(direction) {
+                if (this.gameOver) return;
+                const old = this.grid.map(r => [...r]);
+                const rotMap = { left: 0, right: 2, up: 1, down: 3 };
+                const rot = rotMap[direction];
+                let work = this.rotateGrid(this.grid, rot);
+                let mergeFlags = Array.from({ length: 4 }, () => Array(4).fill(false));
+
+                for (let r = 0; r < 4; r++) {
+                    let row = work[r].filter(v => v !== 0);
+                    let newRow = [];
+                    let mergeRow = [];
+                    let i = 0;
+                    while (i < row.length) {
+                        if (i + 1 < row.length && row[i] === row[i + 1]) {
+                            const val = row[i] * 2;
+                            newRow.push(val);
+                            mergeRow.push(true);
+                            this.score += val;
+                            App.playSfx('merge');
+                            if (val > this.maxTile) {
+                                this.maxTile = val;
+                                document.getElementById('maxTile2048').textContent = this.maxTile;
+                            }
+                            if (val === 2048 && !this.gameWon) {
+                                this.gameWon = true;
+                                App.showToast('🎉 وصلت إلى 2048!');
+                                App.playSfx('win');
+                            }
+                            i += 2;
+                        } else {
+                            newRow.push(row[i]);
+                            mergeRow.push(false);
+                            i++;
+                        }
+                    }
+                    while (newRow.length < 4) {
+                        newRow.push(0);
+                        mergeRow.push(false);
+                    }
+                    work[r] = newRow;
+                    mergeFlags[r] = mergeRow;
+                }
+
+                const invRot = (4 - rot) % 4;
+                this.grid = this.rotateGrid(work, invRot);
+                const finalMerged = this.rotateGrid(mergeFlags, invRot);
+
+                this.moved = false;
+                for (let r = 0; r < 4; r++) {
+                    for (let c = 0; c < 4; c++) {
+                        if (finalMerged[r][c]) this.mergedPositions.add(`${r},${c}`);
+                        if (this.grid[r][c] !== old[r][c]) this.moved = true;
+                    }
+                }
+
+                if (this.moved) {
+                    App.playSfx('move');
+                    this.spawnTile(true);
+                    this.render();
+                    document.getElementById('score2048').textContent = this.score;
+                    if (this.score > this.bestScore) {
+                        this.bestScore = this.score;
+                        this.saveBestScore();
+                        document.getElementById('bestScore2048').textContent = this.bestScore;
+                    }
+                    if (this.isGameOver()) {
+                        this.gameOver = true;
+                        this.render();
+                    }
+                }
+            },
+
+            isGameOver() {
+                for (let r = 0; r < 4; r++) {
+                    for (let c = 0; c < 4; c++) {
+                        if (this.grid[r][c] === 0) return false;
+                        if (c < 3 && this.grid[r][c] === this.grid[r][c + 1]) return false;
+                        if (r < 3 && this.grid[r][c] === this.grid[r + 1][c]) return false;
+                    }
+                }
+                return true;
+            },
+
+            bindSwipeEvents() {
+                const wrapper = document.getElementById('grid2048Wrapper');
+                
+                // Pointer Events (موحد للفأرة واللمس)
+                wrapper.addEventListener('pointerdown', (e) => {
+                    if (this.gameOver) return;
+                    this.touchStartX = e.clientX;
+                    this.touchStartY = e.clientY;
+                    this.touchActive = true;
+                    e.preventDefault();
+                });
+
+                wrapper.addEventListener('pointerup', (e) => {
+                    if (!this.touchActive || this.gameOver) return;
+                    this.touchActive = false;
+                    const dx = e.clientX - this.touchStartX;
+                    const dy = e.clientY - this.touchStartY;
+                    const absDx = Math.abs(dx);
+                    const absDy = Math.abs(dy);
+                    
+                    if (absDx < 15 && absDy < 15) return; // تجاهل النقرات الصغيرة
+                    
+                    if (absDx > absDy) {
+                        this.move(dx > 0 ? 'right' : 'left');
+                    } else {
+                        this.move(dy > 0 ? 'down' : 'up');
+                    }
+                });
+
+                wrapper.addEventListener('pointercancel', () => {
+                    this.touchActive = false;
+                });
+            },
+
+            bindButtons() {
+                document.getElementById('reset2048Btn').addEventListener('click', () => this.reset());
+            },
+
+            bindKeyboard() {
+                document.addEventListener('keydown', (e) => {
+                    if (App.state.currentScreen !== 'game2048Screen') return;
+                    if (this.gameOver) return;
+                    switch (e.key) {
+                        case 'ArrowLeft': e.preventDefault(); this.move('left'); break;
+                        case 'ArrowRight': e.preventDefault(); this.move('right'); break;
+                        case 'ArrowUp': e.preventDefault(); this.move('up'); break;
+                        case 'ArrowDown': e.preventDefault(); this.move('down'); break;
+                    }
+                });
+            }
+        };
+
+        // ==================== لعبة البزل Puzzle ====================
+        const AppPuzzle = {
+            initialized: false,
+            grid: [],
+            size: 3,
+            solved: [],
+            moves: 0,
+            seconds: 0,
+            timerId: null,
+            solved_flag: false,
+            mode: 'numbers',
+            pointerStartTile: null,
+            pointerStartX: 0,
+            pointerStartY: 0,
+            hasMoved: false,
+
+            init() {
+                if (this.initialized) return;
+                this.initialized = true;
+                this.mode = document.getElementById('puzzleModeSelect').value;
+                this.size = 3;
+                this.resetGame();
+                this.bindEvents();
+                this.bindButtons();
+            },
+
+            getSolvedArray() {
+                const total = this.size * this.size;
+                let items = [];
+                
+                if (this.mode === 'numbers') {
+                    for (let i = 1; i < total; i++) items.push(i);
+                    items.push(0);
+                } else if (this.mode === 'english') {
+                    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+                    for (let i = 0; i < total - 1; i++) items.push(letters[i % 26]);
+                    items.push(0);
+                } else if (this.mode === 'arabic') {
+                    const arab = 'أبتثجحخدذرزسشصضطظعغفقكلمنهوي'.split('');
+                    for (let i = 0; i < total - 1; i++) items.push(arab[i % arab.length]);
+                    items.push(0);
+                    // عكس الصفوف للغة العربية (RTL)
+                    let result = [];
+                    for (let row = 0; row < this.size; row++) {
+                        const start = row * this.size;
+                        const end = start + this.size;
+                        const rowItems = items.slice(start, end);
+                        rowItems.reverse();
+                        result.push(...rowItems);
+                    }
+                    return result;
+                }
+                return items;
+            },
+
+            buildShuffled() {
+                const solved = this.getSolvedArray();
+                let arr = [...solved];
+                do {
+                    for (let i = arr.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [arr[i], arr[j]] = [arr[j], arr[i]];
+                    }
+                } while (!this.isSolvable(arr));
+                return arr;
+            },
+
+            isSolvable(arr) {
+                let inv = 0;
+                const flat = arr.filter(v => v !== 0);
+                for (let i = 0; i < flat.length; i++) {
+                    for (let j = i + 1; j < flat.length; j++) {
+                        if (flat[i] > flat[j]) inv++;
+                    }
+                }
+                const emptyRow = Math.floor(arr.indexOf(0) / this.size);
+                if (this.size % 2 === 0) {
+                    return (inv % 2 !== 0) === ((this.size - emptyRow) % 2 === 0);
+                }
+                return inv % 2 === 0;
+            },
+
+            resetGame() {
+                if (this.timerId) clearInterval(this.timerId);
+                this.moves = 0;
+                this.seconds = 0;
+                this.solved_flag = false;
+                this.mode = document.getElementById('puzzleModeSelect').value;
+                this.solved = this.getSolvedArray();
+                this.grid = this.buildShuffled();
+                
+                document.getElementById('puzzleMoves').textContent = '0';
+                document.getElementById('stageLabel').textContent = `${this.size}x${this.size}`;
+                document.getElementById('puzzleTimer').textContent = '00:00';
+                
+                this.removeOverlay();
+                this.render();
+                this.startTimer();
+            },
+
+            startTimer() {
+                if (this.timerId) clearInterval(this.timerId);
+                this.timerId = setInterval(() => {
+                    if (!this.solved_flag) {
+                        this.seconds++;
+                        const m = Math.floor(this.seconds / 60);
+                        const s = this.seconds % 60;
+                        document.getElementById('puzzleTimer').textContent =
+                            `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    }
+                }, 1000);
+            },
+
+            getEmptyIndex() {
+                return this.grid.indexOf(0);
+            },
+
+            isAdjacent(idx) {
+                const e = this.getEmptyIndex();
+                const r1 = Math.floor(idx / this.size), c1 = idx % this.size;
+                const r2 = Math.floor(e / this.size), c2 = e % this.size;
+                return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
+            },
+
+            swap(idx) {
+                if (this.solved_flag || !this.isAdjacent(idx)) return;
+                const e = this.getEmptyIndex();
+                [this.grid[idx], this.grid[e]] = [this.grid[e], this.grid[idx]];
+                this.moves++;
+                document.getElementById('puzzleMoves').textContent = this.moves;
+                App.playSfx('move');
+                this.render();
+                this.checkWin();
+            },
+
+            checkWin() {
+                if (JSON.stringify(this.grid) === JSON.stringify(this.solved)) {
+                    this.solved_flag = true;
+                    if (this.timerId) clearInterval(this.timerId);
+                    App.playSfx('win');
+                    this.render();
+                    App.showToast(`🎉 فوز! أكملت ${this.size}x${this.size}`);
+                }
+            },
+
+            nextStage() {
+                this.removeOverlay();
+                if (this.size === 3) this.size = 4;
+                else if (this.size === 4) this.size = 5;
+                else {
+                    App.showToast('🏆 مبروك! أكملت كل المراحل!');
+                    App.navigateTo('homeScreen');
+                    return;
+                }
+                this.resetGame();
+            },
+
+            removeOverlay() {
+                const wrapper = document.getElementById('gridPuzzleWrapper');
+                const old = wrapper.querySelector('.overlay');
+                if (old) old.remove();
+            },
+
+            render() {
+                const container = document.getElementById('gridPuzzleTiles');
+                container.innerHTML = '';
+                const wrapper = document.getElementById('gridPuzzleWrapper');
+                const w = wrapper.clientWidth;
+                const gap = 6, pad = 10;
+                const tileSize = (w - 2 * pad - (this.size - 1) * gap) / this.size;
+
+                for (let i = 0; i < this.grid.length; i++) {
+                    const val = this.grid[i];
+                    const tile = document.createElement('div');
+                    tile.className = 'tile-puzzle';
+                    
+                    if (val === 0) {
+                        tile.classList.add('empty-tile');
+                    } else {
+                        tile.textContent = val;
+                        if (val === this.solved[i]) {
+                            tile.classList.add('correct-position');
+                        }
+                    }
+                    
+                    const row = Math.floor(i / this.size);
+                    const col = i % this.size;
+                    tile.style.left = `${pad + col * (tileSize + gap)}px`;
+                    tile.style.top = `${pad + row * (tileSize + gap)}px`;
+                    tile.style.width = `${tileSize}px`;
+                    tile.style.height = `${tileSize}px`;
+                    tile.style.lineHeight = `${tileSize}px`;
+                    tile.dataset.index = i;
+                    container.appendChild(tile);
+                }
+
+                this.removeOverlay();
+                if (this.solved_flag) {
+                    const ov = document.createElement('div');
+                    ov.className = 'overlay';
+                    ov.innerHTML = `
+                        <h2>🎉 تهانينا!</h2>
+                        <p>أكملت المرحلة ${this.size}x${this.size}</p>
+                        <p>الحركات: ${this.moves} | الوقت: ${document.getElementById('puzzleTimer').textContent}</p>
+                        <button class="main-btn" style="max-width:200px;margin-top:10px;">➡️ المرحلة التالية</button>
+                        <button class="main-btn secondary-btn" data-nav="homeScreen" style="max-width:200px;margin-top:8px;">🏠 الرئيسية</button>
+                    `;
+                    ov.querySelector('.main-btn:not(.secondary-btn)').addEventListener('click', () => this.nextStage());
+                    ov.querySelector('.secondary-btn').addEventListener('click', () => App.navigateTo('homeScreen'));
+                    wrapper.appendChild(ov);
+                }
+            },
+
+            bindEvents() {
+                const wrapper = document.getElementById('gridPuzzleWrapper');
+                
+                wrapper.addEventListener('pointerdown', (e) => {
+                    const tile = e.target.closest('.tile-puzzle');
+                    if (!tile || tile.classList.contains('empty-tile') || this.solved_flag) return;
+                    this.pointerStartTile = tile;
+                    this.pointerStartX = e.clientX;
+                    this.pointerStartY = e.clientY;
+                    this.hasMoved = false;
+                    e.preventDefault();
+                });
+
+                wrapper.addEventListener('pointerup', (e) => {
+                    if (!this.pointerStartTile || this.solved_flag) {
+                        this.pointerStartTile = null;
+                        return;
+                    }
+                    const dx = e.clientX - this.pointerStartX;
+                    const dy = e.clientY - this.pointerStartY;
+                    const absDx = Math.abs(dx);
+                    const absDy = Math.abs(dy);
+                    
+                    const idx = parseInt(this.pointerStartTile.dataset.index);
+                    
+                    if (absDx < 10 && absDy < 10) {
+                        // نقرة بسيطة
+                        this.swap(idx);
+                    } else if (absDx > 15 || absDy > 15) {
+                        // سحب - نحاول التحرك في اتجاه السحب
+                        this.swap(idx);
+                    }
+                    
+                    this.pointerStartTile = null;
+                });
+
+                wrapper.addEventListener('pointercancel', () => {
+                    this.pointerStartTile = null;
+                });
+            },
+
+            bindButtons() {
+                document.getElementById('resetPuzzleBtn').addEventListener('click', () => this.resetGame());
+            }
+        };
+
+        // ==================== بدء التطبيق ====================
+        App.init();
+
+        // تعريض الدوال العامة للاستخدام في HTML onclick (لحالات نادرة)
+        window.App = App;
+        window.App2048 = App2048;
+        window.AppPuzzle = AppPuzzle;
+
+    })();
+    </script>
+</body>
+</html>
